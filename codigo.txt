@@ -1,0 +1,369 @@
+//DECLARACION DE VARIABLES
+const int UNIDAD = A4;
+const int DECENA = A5;
+const int botonAumentar = 2;
+const int botonRestar = 3;
+const int botonReiniciar = 4;
+const int botonDeslizante = 5;
+int A = 13;
+int B = 12;
+int C = 11;
+int D = 10;
+int E = 9;
+int G = 7;
+int F = 8;
+int sensorLuz = A2;
+int valorSensor;
+int foco = A1;
+int cont = 0;
+int variable = 0;
+int botonPresionado;
+int unidad = 0;
+int decena = 0;
+int conmutador = 0;
+int modo;
+int LED = 6;
+int TMP = A3;
+int motor = A0;
+int temperatura;
+
+
+//INICIO DE FUNCION SETUP()
+void setup()
+{
+  
+  //INICIALIZACION DE LOS PINES
+  pinMode(foco,OUTPUT);
+  pinMode(DECENA, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  pinMode(A,OUTPUT);
+  pinMode(B,OUTPUT);
+  pinMode(C,OUTPUT);
+  pinMode(D,OUTPUT);
+  pinMode(E,OUTPUT);
+  pinMode(F,OUTPUT);
+  pinMode(G,OUTPUT);
+  pinMode(botonAumentar,INPUT_PULLUP);
+  pinMode(botonRestar,INPUT_PULLUP);
+  pinMode(botonReiniciar,INPUT_PULLUP);
+  pinMode(botonDeslizante,INPUT);
+  pinMode(motor,OUTPUT);
+}
+
+/*
+sumar()
+Delay de 3 milisegundos
+Suma en uno al contador
+retorno: void
+*/
+void sumar(){
+  delay(300);
+  cont++;
+  Serial.println(cont);
+}
+
+/*
+restar()
+Delay de 3 milisegundos
+Resta en uno al contador
+retorno: void
+*/
+void restar(){
+  delay(300);
+  cont--;
+}
+
+/*
+reiniciar()
+Delay de 3 milisegundos
+Enciende el motor y mientras esté encendido, resta el contador hasta que llegue a 0 y apaga el motor.
+retorno: void
+*/
+int reiniciar(int cont){
+ 
+  digitalWrite(motor,HIGH);
+  int resultado = digitalRead(motor);
+  
+  if(resultado == HIGH){
+    for(cont; cont>0;cont--){
+    delay(10);
+  	analogWrite(motor,cont);
+	Serial.println(cont);
+   }
+  }
+  digitalWrite(motor,LOW);
+  return cont;
+  
+}
+
+/*
+obteterDecena(int cont)
+param: int cont
+Calcula la decena de un numero y la retorna
+retorno: int
+*/
+int obtenerDecena(int cont){
+  	decena = (cont / 10) % 10;
+    return decena;
+  }
+
+/*
+obtenerUnidad(int cont)
+param: int cont
+Calcula la unidad de un numero y la retorna
+retorno: int
+*/
+int obtenerUnidad(int cont){
+  unidad = cont % 10;
+  return unidad;
+}
+
+
+/*
+esPrimo(int numero)
+param: int numero
+Analiza el numero pasado por parametro y retorna un booleano en caso 
+de que sea o no un numero primo matemático
+retorno: boolean
+*/
+bool esPrimo(int numero) {
+    if (numero <= 1) {
+        return false;
+    }
+    if (numero <= 3) {
+        return true;
+    }
+    if (numero % 2 == 0 || numero % 3 == 0) {
+        return false;
+    }
+    for (int i = 5; i * i <= numero; i += 6) {
+        if (numero % i == 0 || numero % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+  
+//COMIENZO DE LOOP
+void loop()
+{
+  //Obitiene el valor del sensor de luz
+  valorSensor = analogRead(sensorLuz);
+  
+  //Analiza si el valor obtenido es mayor a 1000. Caso True, enciende un foco.
+  if(valorSensor > 1000){
+  	digitalWrite(foco,HIGH);
+  }
+  else{
+  	digitalWrite(foco,LOW);
+  }
+  
+  //Obtiene el valor de una temperatura de la placa arduino
+  temperatura = map(analogRead(TMP),0,1023,-50,450);
+
+  //Analiza si la temperatura es mayor a 25. Caso True, enciende un led
+  if(temperatura>=25){
+    digitalWrite(LED,HIGH);
+  }else{
+  	digitalWrite(LED,LOW);
+  }
+  
+  botonPresionado = -1;
+  
+  
+  //Analiza el retorno de cada botón (si está presionado o no) Y el el resultado se guarda
+  // en una variable
+  if(digitalRead(botonAumentar) == 0)
+  {
+  	botonPresionado = botonAumentar;  
+  }
+  
+  if(digitalRead(botonRestar) == 0)
+  {
+    botonPresionado = botonRestar;
+  }
+  
+  if(digitalRead(botonReiniciar) == 0)
+  {
+    digitalWrite(motor,HIGH);	
+  	botonPresionado = botonReiniciar;
+  }
+  
+  // Lee el valor del switch deslizante
+  modo = digitalRead(botonDeslizante);
+  
+  
+  //Analiza en un switch case el valor de la variable botonResultado
+  switch(botonPresionado)
+  {
+    // Si el contador es = 100, se establece a cero. Se llama a la función sumar() 
+    case botonAumentar:
+      if(cont == 100)
+      {
+          cont = 0;
+      }
+		sumar();
+   		botonPresionado = -1;
+    	break;
+
+    case botonRestar:
+    // Si el contador es = 0, se establece a 100. Se llama a la función restar()
+    	if(cont == 0)
+        {
+    		cont = 100;
+        }
+          restar();
+          botonPresionado = -1;
+          break;
+    
+    //Se llama a la función reiniciar()
+    case botonReiniciar:
+    cont = reiniciar(cont);
+      botonPresionado = -1;
+      break;
+  
+    default:
+      cont = cont;
+      break;
+  }
+  
+ //Delay para ilusión de que ambos ambos displays estén encendidos 
+ delay(50);
+
+  //Obtiene decena y unidad
+ unidad = obtenerUnidad(cont);
+ decena = obtenerDecena(cont);
+  
+  //Si el switch está en modo HIGH, valida si el numero actual es primo o no. Caso False, los establece en cero
+  if(modo==HIGH)
+  {
+      int resultado = esPrimo(cont);
+
+      if(resultado == false)
+      {
+        unidad = 0;
+        decena = 0;
+
+      }
+   	}
+
+  // Enciende y apaga los displays según el valor del conmutador
+  if(conmutador == 0)
+  {
+      digitalWrite(UNIDAD,HIGH);
+      digitalWrite(DECENA,LOW);
+      variable = unidad;
+      conmutador = 1;
+  }
+  else
+  {
+      digitalWrite(UNIDAD,LOW);
+      digitalWrite(DECENA,HIGH);
+      variable = decena;
+      conmutador = 0;
+  }
+  
+  // Enciende los displays uno por vez según la informaicón que le pase el loop. (Unidad/Decena)
+  switch(variable)
+  {
+      case 0:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,HIGH);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,LOW);
+        break;
+
+      case 1:
+        digitalWrite(A,LOW);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,LOW);
+        digitalWrite(E,LOW);
+        digitalWrite(F,LOW);
+        digitalWrite(G,LOW);
+        break;
+
+      case 2:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,LOW);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,HIGH);
+        digitalWrite(F,LOW);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 3:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,LOW);
+        digitalWrite(F,LOW);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 4:
+        digitalWrite(A,LOW);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,LOW);
+        digitalWrite(E,LOW);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 5:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,LOW);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,LOW);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 6:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,LOW);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,HIGH);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 7:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,LOW);
+        digitalWrite(E,LOW);
+        digitalWrite(F,LOW);
+        digitalWrite(G,LOW);
+        break;
+
+      case 8:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,HIGH);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,HIGH);
+        break;
+
+      case 9:
+        digitalWrite(A,HIGH);
+        digitalWrite(B,HIGH);
+        digitalWrite(C,HIGH);
+        digitalWrite(D,HIGH);
+        digitalWrite(E,LOW);
+        digitalWrite(F,HIGH);
+        digitalWrite(G,HIGH);
+        break;
+	}
+}
