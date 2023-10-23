@@ -112,4 +112,4 @@ bool esPrimo(int numero) {
 }
 ~~~
 ## :robot: Link al proyecto
-- [LINK](https://www.tinkercad.com/things/lTldmOFTOfM)
+- [LINK] https://www.tinkercad.com/things/lTldmOFTOfM
