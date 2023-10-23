@@ -1,12 +1,11 @@
-# SPD-PARTE3
+# SPD PARTE 3
+# Oliveira Santiago - 40393965
 
-# Ejemplo Documentación 
+# ARDUINO
 ![Arduino](https://hardwarelivreusp.org/assets/images/tutoriais/arduino/arduino_oscomm.png)
 
 ## Integrantes 
 - Santiago Oliveira
-
-![Tinkercad](parte11.png)
 
 ## Descripción
 Suma,resta y reinicia (con un motor) un contador, el cual se mostrará en dos displays de 7 segmentos 
@@ -111,5 +110,19 @@ bool esPrimo(int numero) {
     return true;
 }
 ~~~
+
+## Motor CC
+![Tinkercad](Motor-CC.png)
+
+Un motor CC en Arduino es un tipo de motor eléctrico que gira cuando le das electricidad, y cambia de dirección de giro cuando se invierta la electricidad. Es muy útil en proyectos de robots y automatización controlados con Arduino.
+Podría utilizarle en:
+1) Robótica: Para mover las ruedas de un robot o controlar sus movimientos.
+2) Automatización: Para abrir y cerrar puertas, ventanas, persianas o cualquier mecanismo de control de acceso.
+3) Proyectos de juguetes: En autos teledirigidos, aviones de control remoto y otros juguetes motorizados.
+4) Impresoras 3D: Para controlar los movimientos de los ejes de la impresora y el extrusor de filamento.
+5) Proyectos de electrónica y bricolaje: En general, para cualquier aplicación que requiera movimiento controlado.
+6) Podríamos utilizarlo en nuestro proyecto para que, según donde esté girando, sume o reste el contador que posteriormente se va a mostrar en los displays. 
+
+
 ## :robot: Link al proyecto
 - [LINK] https://www.tinkercad.com/things/lTldmOFTOfM
